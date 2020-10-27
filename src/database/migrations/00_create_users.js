@@ -3,7 +3,7 @@ exports.up = function(knex) {
     .createTable('users', function (table) {
        table.increments('id');
        table.string('login').notNullable();
-       table.string('senha').notNullable();
+       table.string('password').notNullable();
     })
 
 };
