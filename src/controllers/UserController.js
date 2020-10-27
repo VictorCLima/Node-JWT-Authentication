@@ -3,7 +3,7 @@ const express = require ('express');
 import db from '../database/connection';
 
 
-export default class CreateUserController {
+export default class UserController {
 
   async create(request, response)  {
     const {

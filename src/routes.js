@@ -4,11 +4,11 @@ const routes = router;
 
 
 
-import CreateUserController from './controllers/CreateUserController'
-const createUserController = new CreateUserController();
+import UserController from './controllers/UserController'
+const userController = new UserController();
 
 
 
-routes.get('/login', createUserController.create);
+routes.get('/login', userController.create);
 
 export default routes;
