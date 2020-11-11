@@ -7,6 +7,13 @@ const userController = new UserController();
 
 
 
-routes.get('/login', userController.create);
+routes.post('/user', userController.create);
+routes.get('/user', userController.index);
+routes.put('/user/:id', userController.update);
+routes.delete('/user/:id', userController.delete);
+
+
+
+
 
 export default routes;

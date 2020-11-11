@@ -1,62 +1,100 @@
-const express = require ('express');
 const bcrypt = require ('bcrypt');
 
 import db from '../database/connection';
 
 
-
-/* const hashPassword = ( password,  callback) => {
-  //generate salt hen run callback
-  bcrypt.genSalt(10, (err, salt) => {
-    if(err) {
-      return callback(err);
-    }
-  })
-// hash (encrypt) the password using the salt then run callback
-  bcrypt.hash(password, salt, null, () => {
-    if(err) {
-      return callback(err);
-    }
-  })
-// overwrite plain text password with encrypted password
-  callback(null,)
-
-} */
-
-
 export default class UserController {
 
-
-  async create(request, response)  {
+//User create
+  async create(req , res, next )  {
     const {
       login,
       password
-    } = request.body;
-
+    } = req.body;
 
     const trx = await db.transaction();
 
     try {
+      const salt = await bcrypt.genSalt();
+      req.body.password = await bcrypt.hash(req.body.password, salt)
 
-      const salt = await bcrypt.genSalt()
-
-      request.body.password =   await bcrypt.hash(request.body.password, salt)
-
-      await trx('users').insert({
+      await trx('users')
+      .insert({
         login,
-        password: request.body.password
+        password : req.body.password
       })
-
       await trx.commit();
+      return res.status(201).send()
 
-      return response.status(201).send();
+    } catch(error) {
+
+        await trx.rollback();
+        next(error)
+
+      }
+
+  }
+
+
+  //Users list
+  async index(req, res, next)  {
+
+    const trx = await db.transaction();
+    try {
+
+      const results = await trx('users')
+      return res.json(results);
+      console.log(results);
+
+    } catch(error) {
+      await trx.rollback();
+      next(error)
+    }
+  }
+
+
+  //Edit user
+  async update(req , res, next)  {
+    const { login } = req.body
+    const { id } = req .params
+
+    //const trx = await db.transaction();
+
+    try {
+
+      await db('users')
+      .update({ login })
+      .where({ id })
+
+
+      return res.send();
+
 
     } catch(err) {
+        await db.rollback();
+        next(error)
+    }
+  }
 
-      await trx.rollback();
-      return response.status(400).json({
-        error: 'Ocorreu um erro ao criar o usuário',
-      })
+  async delete(req , res, next)  {
+    const { login } = req.body
+    const { id } = req .params
+
+    //const trx = await db.transaction();
+
+    try {
+
+      await db('users')
+      .delete({ login })
+      .where({ id })
+
+
+      return res.send();
+
+
+    } catch(err) {
+        await db.rollback();
+        next(error)
     }
   }
 }
